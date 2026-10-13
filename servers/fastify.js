@@ -1,19 +1,23 @@
 import Fastify from "fastify";
-import { handleItems } from "../lib/payload.js";
+import { makeItems } from "../makeItems.js";
 
-const PORT = Number(process.env.PORT) || 3002;
 const app = Fastify();
 
-app.get("/simple", async () => ({ message: "hi" }));
-
-app.patch("/api/items/:id", async (request, reply) => {
-  const { status, data } = handleItems({
-    id: request.params.id,
-    filter: request.query.filter,
-    body: request.body,
-  });
-  return reply.code(status).send(data);
+// Simple route: returns a tiny JSON
+app.get("/simple", (request, reply) => {
+  reply.send({ message: "hi" });
 });
 
-await app.listen({ port: PORT, host: "127.0.0.1" });
-console.log(`[fastify] pid ${process.pid} listening on ${PORT}`);
+// Heavy route: returns a big JSON (about 32 KB)
+app.patch("/items/:id", (request, reply) => {
+  const id = Number(request.params.id);
+  if (isNaN(id)) {
+    return reply.code(400).send({ error: "id must be a number" });
+  }
+  reply.send({ id: id, filter: request.query.filter, items: makeItems() });
+});
+
+app.listen({ port: 3002, host: "127.0.0.1" }, (err) => {
+  if (err) throw err; // for example: the port is already in use
+  console.log("fastify is running on port 3002");
+});

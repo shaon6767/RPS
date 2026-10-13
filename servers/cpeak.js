@@ -1,32 +1,22 @@
-import cpeak, { parseJSON } from "cpeak";
-import { handleItems } from "../lib/payload.js";
+import cpeak from "cpeak";
+import { makeItems } from "../makeItems.js";
 
-const PORT = Number(process.env.PORT) || 3000;
 const server = cpeak();
 
-server.beforeEach(parseJSON());
-
+// Simple route: returns a tiny JSON
 server.route("get", "/simple", (req, res) => {
   return res.json({ message: "hi" });
 });
 
-server.route("patch", "/api/items/:id", (req, res) => {
-  const { status, data } = handleItems({
-    id: req.params.id,
-    filter: req.query.filter,
-    body: req.body,
-  });
-  return res.status(status).json(data);
-});
-
-server.handleErr((error, req, res) => {
-  if (error && error.status) {
-    return res.status(error.status).json({ error: error.message });
+// Heavy route: returns a big JSON (about 32 KB)
+server.route("patch", "/items/:id", (req, res) => {
+  const id = Number(req.params.id);
+  if (isNaN(id)) {
+    return res.status(400).json({ error: "id must be a number" });
   }
-  console.error(error);
-  return res.status(500).json({ error: "Something went wrong." });
+  return res.json({ id: id, filter: req.query.filter, items: makeItems() });
 });
 
-server.listen(PORT, "127.0.0.1", () => {
-  console.log(`[cpeak] pid ${process.pid} listening on ${PORT}`);
+server.listen(3000, "127.0.0.1", () => {
+  console.log("cpeak is running on port 3000");
 });
