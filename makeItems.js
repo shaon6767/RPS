@@ -6,7 +6,7 @@ export function makeItems() {
       id: i,
       name: "item-" + i,
       description:
-        "Dummy text to make the response bigger, like a real API response. Dummy text to make the response bigger, like a real API response. Dummy text to make the response bigger.",
+        "A text to make the response bigger, like a real API response. This text doesnt mean anything, it is just a filler text to make the response bigger.",
       tags: ["alpha", "beta", "gamma", "delta"],
       price: i * 1.37,
       inStock: i % 2 === 0,

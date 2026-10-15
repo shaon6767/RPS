@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "node --watch servers/cpeak.js"
+    "dev": "node servers/cpeak.js"
   },
   "keywords": [],
   "author": "",
